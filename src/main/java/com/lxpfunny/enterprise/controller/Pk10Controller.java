@@ -5,6 +5,8 @@ import com.lxpfunny.enterprise.util.JsonUtils;
 import com.lxpfunny.enterprise.util.pk10;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -83,7 +85,7 @@ public class Pk10Controller {
 
     public static void main(String[] args) {
 
-        getKaijiang();
+        login();
     }
 
     private static void touzhu(String cookie) {
@@ -520,6 +522,36 @@ public class Pk10Controller {
         String url = "https://www.aob10.com/Bjpk10Chart.aspx";
         String resonse = HttpUtils.doGet(url, null, null);
         return parseHtml(resonse);
+    }
+    /**
+     * 获取历史开奖号
+     *
+     * @return
+     */
+    private static void login() {
+        String loginurl = "https://www.aob10.com/aobei/login.aspx";
+        CloseableHttpResponse resp = HttpUtils.doGetSSLResponse(loginurl, null, null);
+        Header[] headers = resp.getHeaders("Set-Cookie");
+        String uid = headers[0].getValue().split(";")[0];
+        String sissionId =headers[1].getValue().split(";")[0];
+        String cookie = uid+";"+sissionId;
+        cookie = "__cfduid=d78da6e786da48a75f87e0109b464756a1543198173; ASP.NET_SessionId=alxjwvnluww4iumunqtjuxq0";
+        String url = "https://www.aob10.com/httphandle/UserHandler.ashx";
+        Map<String, String> header = new HashMap<>();
+        header.put("Cookie", cookie);
+        Map<String, Object> param = new HashMap<>();
+        param.put("action", "1");
+        param.put("type", "2");
+        param.put("uname", "aaa111");
+        param.put("pwd", "aaa111");
+        param.put("code", "9239");
+        String resonse = null;
+        try {
+            resonse = HttpUtils.doPost(url, header, param);
+            System.out.println(resonse);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static List<String> parseHtml(String resposne) {

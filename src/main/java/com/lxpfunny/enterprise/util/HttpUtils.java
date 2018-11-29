@@ -140,6 +140,61 @@ public class HttpUtils {
      * @param params  参数map
      * @return
      */
+    public static CloseableHttpResponse doGetSSLResponse(String url, Map<String, String> headers, Map<String, Object> params) {
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory()).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
+        CloseableHttpResponse response = null;
+        String apiUrl = url;
+        String httpStr = null;
+        StringBuffer param = new StringBuffer();
+        int i = 0;
+        if(params!=null){
+            for (String key : params.keySet()) {
+                if (i == 0)
+                    param.append("?");
+                else
+                    param.append("&");
+                param.append(key).append("=").append(params.get(key));
+                i++;
+            }
+            apiUrl += param;
+        }
+
+
+        try {
+            HttpGet httpGet = new HttpGet(apiUrl);
+            httpGet.setConfig(requestConfig);
+            //添加http headers
+            if (headers != null && headers.size() > 0) {
+                for (String key : headers.keySet()) {
+                    httpGet.addHeader(key, headers.get(key));
+                }
+            }
+            response = httpClient.execute(httpGet);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                try {
+                    EntityUtils.consume(response.getEntity());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return response;
+
+
+    }
+
+    /**
+     * 发送 SSL Get 请求（HTTPS），K-V形式
+     *
+     * @param url     API接口URL
+     * @param headers
+     * @param params  参数map
+     * @return
+     */
     public static String doGetSSL(String url, Map<String, String> headers, Map<String, Object> params) {
         CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory()).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
         CloseableHttpResponse response = null;
