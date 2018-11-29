@@ -14,10 +14,19 @@
             });
             $("#search").on("click", function () {
                 $("#jilu  tr:not(:first)").html("");
+                var startTime = $("#startTime").val();
+                var endTime = $("#endTime").val();
+                var param = {"cookie": $("#cookie").val()};
+                if(startTime != ""){
+                    param.startTime = startTime;
+                }
+                if(endTime != ""){
+                    param.endTime = endTime;
+                }
                 $.ajax({
                     url: "/pk10/jilu",
                     type: "post",
-                    data: JSON.stringify({"cookie": $("#cookie").val()}),
+                    data: JSON.stringify(param),
                     contentType: "application/json",
                     dataType: "json",
                     success: function (data) {
@@ -52,7 +61,30 @@
 
     </script>
 </head>
-<body style="background-image: url(05d922a0b0c5518dba4e5d295dccf269.jpg)">
+<style>
+    .background{
+height: 1000px;
+position: absolute;
+        width: 100%;
+        background: url(05d922a0b0c5518dba4e5d295dccf269.jpg) 50% 0 no-repeat;
+        z-index: -1;
+        left:0;
+        right:0;
+        opacity: 0.4;
+      }
+    img{
+        border: none;
+    }
+    .main{
+        margin:0 auto;
+        width:900px;
+        /*background: gray;*/
+        height: 900px;
+    }
+</style>
+<body >
+<div class="background"></div>
+<div class="main">
 <div>
   <h1>澳贝下单</h1>
     <h3>服务器状态:<a id="isStop" style="color: red"></a></h3>
@@ -62,6 +94,8 @@
   </form>
   <button id="submit">下单</button><hr>
   <button id="search">查询</button><hr>
+    <span>开始时间：</span><input type="text" id="startTime" name="startTime"/>
+    <span>结束时间：</span><input type="text" id="endTime" name="endTime"/>
 </div>
 <div>
     <h1>下单记录</h1>
@@ -77,7 +111,7 @@
         </tr>
     </table>
 </div>
-
+</div>
 </body>
 
 </html>
