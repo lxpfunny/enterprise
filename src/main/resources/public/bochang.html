@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>上海咏鹤相册制作有限公司</title>
+    <script src="jquery-1.7.2.js"></script>
+    <script src="jquery.form.js"></script>
+    <script>
+        $(function(){
+
+            exportBochang();
+
+
+        });
+
+        function exportBochang(){
+            $("#import").on("click",function(){
+                $("#fileForm").attr("action","/excel/uploadBochang");
+                if($("#file").val() == ""){
+                    alert("请选择要导入的excel文件");
+                    return;
+                }
+                if($("#fileName").val() == ""){
+                    alert("请输入导出文件名！");
+                    return;
+                }
+                if(confirm("是否确定导入")){
+                    $("#fileForm").submit();
+                }
+            });
+        }
+
+
+    </script>
+</head>
+<body style="background-image: url(05d922a0b0c5518dba4e5d295dccf269.jpg)">
+<div>
+  <h1>伯昌账单转换</h1>
+  <form  class="form-horizontal" action="/excel/uploadBochang "method="post" id="fileForm" enctype="multipart/form-data">
+      <input id="file" class="form-input" name="file" type="file"/><br>
+      <span>导出excel文件名：</span><input type="text" id="fileName" name="fileName"/><br>
+  </form>
+  <button id="import">走你</button><hr>
+</div>
+
+
+
+</body>
+
+</html>

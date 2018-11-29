@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>上海咏鹤相册制作有限公司</title>
+    <script src="jquery-1.7.2.js"></script>
+    <script src="jquery.form.js"></script>
+    <script>
+        $(function(){
+
+            exportYiti();
+            exportCover();
+            importBase();
+
+
+        });
+
+        function exportYiti(){
+            $("#import").on("click",function(){
+                $("#fileForm").attr("action","/excel/upload");
+                if($("#file").val() == ""){
+                    alert("请选择要导入的excel文件");
+                    return;
+                }
+                if($("#fileName").val() == ""){
+                    alert("请输入导出文件名！");
+                    return;
+                }
+                if($("#quotation").val() == ""){
+                    alert("请输入要使用的产品报价，例如：LUNA");
+                    return;
+                }
+                if(confirm("是否确定导入")){
+                    $("#fileForm").submit();
+                }
+            });
+        }
+
+        function importBase(){
+
+            $("#importBase").on("click",function(){
+                if($("#baseFile").val() == ""){
+                    alert("请选择要导入的excel文件");
+                    return;
+                }
+
+                if(confirm("是否确定导入")){
+                    $("#baseForm").ajaxSubmit(function(){
+                        alert("导入成功");
+                    });
+                }
+            });
+        }
+
+
+        function exportCover(){
+            $("#coverImport").on("click",function(){
+                $("#coverForm").attr("action","/excel/uploadCover");
+                if($("#coverFile").val() == ""){
+                    alert("请选择要导入的excel文件");
+                    return;
+                }
+                if($("#coverName").val() == ""){
+                    alert("请输入导出文件名！");
+                    return;
+                }
+                if(confirm("是否确定导入")){
+                    $("#coverForm").submit();
+                }
+            });
+        }
+    </script>
+</head>
+<body style="background-image: url(05d922a0b0c5518dba4e5d295dccf269.jpg)">
+<div>
+  <h1>艺匠一体账单转换</h1>
+  <form  class="form-horizontal" action="/excel/upload "method="post" id="fileForm" enctype="multipart/form-data">
+      <input id="file" class="form-input" name="file" type="file"/><br>
+      <span>导出excel文件名：</span><input type="text" id="fileName" name="fileName"/><br>
+      <span>报价：</span><input type="text" id="quotation" name="quotation" placeholder="请输入报价,如：LUNA"/>
+  </form>
+  <button id="import">走你</button><hr>
+</div>
+
+
+<div>
+    <h1>艺匠封面账单转换</h1>
+    <form  class="form-horizontal" action="/excel/uploadCover"method="post" id="coverForm" enctype="multipart/form-data">
+        <input id="coverFile" class="form-input" name="coverFile" type="file"/><br>
+        <span>导出excel文件名：</span><input type="text" id="coverName" name="coverName"/>
+    </form>
+    <button id="coverImport">走你</button><hr>
+</div>
+
+<div>
+    <h1>导入永鹤报价数据</h1>
+    <form  class="form-horizontal" action="/excel/importBase "method="post" id="baseForm" enctype="multipart/form-data">
+        <input id="baseFile" class="form-input" name="baseFile" type="file"/>
+    </form>
+    <button id="importBase">走你</button>
+    <div>
+        <hr>
+    <label style="color:red">***注意：
+        <ul>
+            <li>导入报价前请删除excel列名行以上多余行</li>
+            <li>导入前请将excel另存为*.xls格式</li>
+            <li>此工具只适用与艺匠的格式。如需要支持其他公司的格式需要额外添加功能</li>
+        </ul>
+    </label>
+    </div>
+
+</div>
+
+  <!--<button id="upload">上传</button>-->
+  <!--<form  class="form-horizontal" action="/excel/export "method="post" id="exportForm">-->
+      <!--<button id="export">导出</button>-->
+
+  <!--</form>-->
+
+</body>
+
+</html>

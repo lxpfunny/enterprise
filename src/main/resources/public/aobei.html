@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>澳贝</title>
+    <script src="jquery-1.7.2.js"></script>
+    <script src="jquery.form.js"></script>
+    <script>
+        $(function(){
+            $("#submit").on("click",function(){
+                if(confirm("是否确定开始下单")){
+                    $("#orderForm").submit();
+                }
+            });
+            $("#search").on("click", function () {
+                $("#jilu  tr:not(:first)").html("");
+                $.ajax({
+                    url: "/pk10/jilu",
+                    type: "post",
+                    data: JSON.stringify({"cookie": $("#cookie").val()}),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        $.each(data, function (i) {
+                            var d = data[i];
+                            var tr = "<tr><td>" + d.tn + "</td><td>" + d.at + "</td><td>" + d.by + "</td><td>" + d.bs + "</td><td>" + d.os + "</td><td><a href='https://www.aob10.com/Order.aspx?oid=" + d.id + "' target='_blank'>查看</a></td></tr>";
+                            $("#jilu").append($(tr));
+                        });
+
+                    },
+                    error: function (msg) {
+                        alert(msg);
+                    }
+
+
+                });
+            });
+            $.ajax( {
+                url:"/pk10/getcookie",
+                type:"get",
+                contentType:"application/json",
+                dataType:"json",
+                success:function(data){
+                    var isStop = data.isStop;
+                    var cookieCache = data.cookieCache;
+                    $("#isStop").text(isStop);
+                    $("#cookieCache").text(cookieCache);
+                }
+            });
+
+        });
+
+    </script>
+</head>
+<body style="background-image: url(05d922a0b0c5518dba4e5d295dccf269.jpg)">
+<div>
+  <h1>澳贝下单</h1>
+    <h3>服务器状态:<a id="isStop" style="color: red"></a></h3>
+    <h3>缓存cookie:<a id="cookieCache"></a></h3>
+  <form  class="form-horizontal" action="/pk10/start "method="get" id="orderForm" enctype="text/plain">
+      <span>cookie：</span><input type="text" id="cookie" name="cookie"/>
+  </form>
+  <button id="submit">下单</button><hr>
+  <button id="search">查询</button><hr>
+</div>
+<div>
+    <h1>下单记录</h1>
+    <table id="jilu" style="text-align:center;">
+        <tr>
+            <!--https://www.aob10.com/Order.aspx?oid=4252344D46B10CDD7101B9E6C18A094B-->
+            <td width="10%">期号</td>
+            <td width="30%" >时间</td>
+            <td width="20%">投注金额</td>
+            <td width="20%">中奖金额</td>
+            <td width="10%">中奖状态</td>
+            <td>操作</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+
+</html>
