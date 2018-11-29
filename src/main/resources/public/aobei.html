@@ -12,6 +12,31 @@
                     $("#orderForm").submit();
                 }
             });
+            $("#login").on("click", function () {
+                $.ajax({
+                    url: "/pk10/login",
+                    type: "get",
+                    success: function (data) {
+                        var code = data.respCode;
+                        var balance = data.balance;
+                        var cookieCache = data.cookieCache;
+                        if(code == 0){
+                            $("#balance").html(balance);
+                            $("#cookie").val(cookieCache);
+                            $("#cookieCache").html(cookieCache);
+                            alert("登陆成功");
+                        }else{
+                            alert("登陆失败");
+                        }
+
+                    },
+                    error: function (msg) {
+                        alert(msg);
+                    }
+
+
+                });
+            });
             $("#search").on("click", function () {
                 $("#jilu  tr:not(:first)").html("");
                 var startTime = $("#startTime").val();
@@ -88,13 +113,15 @@ position: absolute;
 <div class="main">
 <div>
   <h1>澳贝下单</h1>
+    <h3>余额：</h3><span id="balance"></span>
     <h3>服务器状态:<a id="isStop" style="color: red"></a></h3>
     <h3>缓存cookie:<a id="cookieCache"></a></h3>
   <form  class="form-horizontal" action="/pk10/start "method="get" id="orderForm" enctype="text/plain">
       <span>cookie：</span><input type="text" id="cookie" name="cookie"/>
   </form>
   <button id="submit">下单</button><hr>
-  <button id="search">查询</button><hr>
+  <button id="login">登陆</button><hr>
+    <button id="search">查询</button><hr>
     <span>开始时间：</span><input type="text" id="startTime" name="startTime"/>
     <span>结束时间：</span><input type="text" id="endTime" name="endTime"/>
 </div>

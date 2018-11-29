@@ -122,7 +122,12 @@
 			<version>1.11.3</version>
 		</dependency>
 
-
+        <!--图片识别-->
+		<dependency>
+			<groupId>com.asprise.ocr</groupId>
+			<artifactId>java-ocr-api</artifactId>
+			<version>[15,)</version>
+		</dependency>
 
 
 	</dependencies>

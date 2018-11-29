@@ -173,14 +173,6 @@ public class HttpUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (response != null) {
-                try {
-                    EntityUtils.consume(response.getEntity());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return response;
 
@@ -233,6 +225,7 @@ public class HttpUtils {
             if (entity == null) {
                 return null;
             }
+
             httpStr = EntityUtils.toString(entity, "utf-8");
         } catch (Exception e) {
             e.printStackTrace();
