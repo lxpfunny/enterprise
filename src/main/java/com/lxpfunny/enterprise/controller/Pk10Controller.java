@@ -34,6 +34,7 @@ public class Pk10Controller {
     static boolean isStop = false;
     static boolean isLogin = false;
     static boolean isSleep = true;
+    static String balance = "";
     static String cookieCache = "";
     static Map<String, Thread> threadMap = new HashMap<>();
 
@@ -42,6 +43,7 @@ public class Pk10Controller {
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("cookieCache", cookieCache);
         returnMap.put("isStop", !isStop ? "运行中" : "停止");
+        returnMap.put("balance", balance);
         return returnMap;
     }
 
@@ -645,6 +647,7 @@ public class Pk10Controller {
 //                }
                 if ("0".equals(res[0])) {
                     System.out.println("登陆成功");
+                    balance = res[1];
                     respMap.put("balance", res[1]);
                     respCode = "0";
                     respMap.put("cookieCache", cookie);
