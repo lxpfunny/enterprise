@@ -38,7 +38,7 @@
                 });
             });
             $("#search").on("click", function () {
-                $("#jilu  tr:not(:first)").html("");
+                $("#jilu  tr:not(:first)").remove();
                 var startTime = $("#startTime").val();
                 var endTime = $("#endTime").val();
                 var param = {"cookie": $("#cookie").val()};
