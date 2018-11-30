@@ -77,6 +77,7 @@
                 success:function(data){
                     var isStop = data.isStop;
                     var cookieCache = data.cookieCache;
+                    var balance = data.balance;
                     $("#isStop").text(isStop);
                     $("#cookieCache").text(cookieCache);
                     $("#cookie").val(cookieCache);
