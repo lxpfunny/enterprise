@@ -6,13 +6,21 @@
     <script src="jquery-1.7.2.js"></script>
     <script src="jquery.form.js"></script>
     <script>
-        $(function(){
-            $("#submit").on("click",function(){
-                if(confirm("是否确定开始下单")){
+        $(function () {
+            $("#submit").on("click", function () {
+                if (!checkAuthCode()) {
+                    alert("请输入正确的操作码");
+                    return;
+                }
+                if (confirm("是否确定开始下单")) {
                     $("#orderForm").submit();
                 }
             });
             $("#login").on("click", function () {
+                if (!checkAuthCode()) {
+                    alert("请输入正确的操作码");
+                    return;
+                }
                 $.ajax({
                     url: "/pk10/login",
                     type: "get",
@@ -20,12 +28,12 @@
                         var code = data.respCode;
                         var balance = data.balance;
                         var cookieCache = data.cookieCache;
-                        if(code == 0){
+                        if (code == 0) {
                             $("#balance").html(balance);
                             $("#cookie").val(cookieCache);
                             $("#cookieCache").html(cookieCache);
                             alert("登陆成功");
-                        }else{
+                        } else {
                             alert("登陆失败");
                         }
 
@@ -38,14 +46,15 @@
                 });
             });
             $("#search").on("click", function () {
+
                 $("#jilu  tr:not(:first)").remove();
                 var startTime = $("#startTime").val();
                 var endTime = $("#endTime").val();
                 var param = {"cookie": $("#cookie").val()};
-                if(startTime != ""){
+                if (startTime != "") {
                     param.startTime = startTime;
                 }
-                if(endTime != ""){
+                if (endTime != "") {
                     param.endTime = endTime;
                 }
                 $.ajax({
@@ -69,12 +78,12 @@
 
                 });
             });
-            $.ajax( {
-                url:"/pk10/getcookie",
-                type:"get",
-                contentType:"application/json",
-                dataType:"json",
-                success:function(data){
+            $.ajax({
+                url: "/pk10/getcookie",
+                type: "get",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (data) {
                     var isStop = data.isStop;
                     var cookieCache = data.cookieCache;
                     var balance = data.balance;
@@ -85,64 +94,90 @@
                 }
             });
 
+            function checkAuthCode() {
+                var val = prompt('请输入授权的校验码', '');
+                $.ajax({
+                    url: "/pk10/authCode",
+                    type: "get",
+                    data: {"authCode": val},
+                    success: function (data) {
+                        if (data == 1) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+            }
+
         });
 
     </script>
 </head>
 <style>
-    .background{
-height: 1000px;
-position: absolute;
+    .background {
+        height: 1000px;
+        position: absolute;
         width: 100%;
         background: url(05d922a0b0c5518dba4e5d295dccf269.jpg) 50% 0 no-repeat;
         z-index: -1;
-        left:0;
-        right:0;
+        left: 0;
+        right: 0;
         opacity: 0.4;
-      }
-    img{
+    }
+
+    img {
         border: none;
     }
-    .main{
-        margin:0 auto;
-        width:900px;
+
+    .main {
+        margin: 0 auto;
+        width: 900px;
         /*background: gray;*/
         height: 900px;
     }
 </style>
-<body >
+<body>
 <div class="background"></div>
 <div class="main">
-<div>
-  <h1>澳贝下单</h1>
-    <h3>余额：</h3><span id="balance"></span>
-    <h3>服务器状态:<a id="isStop" style="color: red"></a></h3>
-    <h3 style="display: none">缓存cookie:<a id="cookieCache"></a></h3>
-  <form  class="form-horizontal" action="/pk10/start "method="get" id="orderForm" enctype="text/plain">
-      <span>cookie：</span><input type="text" id="cookie" name="cookie"/>
-      <span>钱类型：</span><input type="text" id="qianType" name="qianType"/>
-      <span>起始倍数：</span><input type="text" id="bei" name="bei"/>
-  </form>
-  <button id="submit">下单</button><hr>
-  <button id="login">登陆</button><hr>
-    <button id="search">查询</button><hr>
-    <span>开始时间：</span><input type="text" id="startTime" name="startTime"/>
-    <span>结束时间：</span><input type="text" id="endTime" name="endTime"/>
-</div>
-<div>
-    <h1>下单记录</h1>
-    <table id="jilu" style="text-align:center;">
-        <tr>
-            <!--https://www.aob10.com/Order.aspx?oid=4252344D46B10CDD7101B9E6C18A094B-->
-            <td width="10%">期号</td>
-            <td width="30%" >时间</td>
-            <td width="20%">投注金额</td>
-            <td width="20%">中奖金额</td>
-            <td width="10%">中奖状态</td>
-            <td>操作</td>
-        </tr>
-    </table>
-</div>
+    <div>
+        <h1>澳贝下单</h1>
+        <h3>余额：</h3><span id="balance"></span>
+        <h3>服务器状态:<a id="isStop" style="color: red"></a></h3>
+        <h3 style="display: none">缓存cookie:<a id="cookieCache"></a></h3>
+        <form class="form-horizontal" action="/pk10/start " method="get" id="orderForm" enctype="text/plain">
+            <span>cookie：</span><input type="text" id="cookie" name="cookie"/>
+            <span>钱类型：</span><input type="text" id="qianType" name="qianType"/>
+            <span>起始倍数：</span><input type="text" id="bei" name="bei"/>
+        </form>
+        <hr>
+        <div >
+            <button id="submit">下单</button>
+            <button id="login">登陆</button>
+            <button id="search">查询</button>
+        </div>
+        <hr>
+        <div>
+            <span>开始时间：</span><input type="text" id="startTime" name="startTime"/>
+            <span>结束时间：</span><input type="text" id="endTime" name="endTime"/>
+        </div>
+    </div>
+    <div>
+        <h1>下单记录</h1>
+        <div style="overflow:auto;">
+        <table id="jilu" style="text-align:center;">
+            <tr>
+                <!--https://www.aob10.com/Order.aspx?oid=4252344D46B10CDD7101B9E6C18A094B-->
+                <td width="10%">期号</td>
+                <td width="30%">时间</td>
+                <td width="20%">投注金额</td>
+                <td width="20%">中奖金额</td>
+                <td width="10%">中奖状态</td>
+                <td>操作</td>
+            </tr>
+        </table>
+        </div>
+    </div>
 </div>
 </body>
 

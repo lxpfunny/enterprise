@@ -58,6 +58,9 @@ public class Pk10Controller {
         String response = "";
         try {
              response = HttpUtils.doPost(url, header, param);
+             if("-100".equals(response)){
+                 return "未登录";
+             }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -564,8 +567,8 @@ public class Pk10Controller {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (resonse.equals("-1")) {
-            throw new RuntimeException("登陆超时");
+        if (resonse.equals("-1")|| resonse.equals("-100")) {
+            return new ArrayList<>();
         }
         resonse = resonse.replace("'", "\"");
         Map<String, Object> data = JsonUtils.fromJson(resonse, Map.class);
@@ -686,6 +689,19 @@ public class Pk10Controller {
         respMap.put("respCode", respCode);
         return respMap;
 
+    }
+
+    /**
+     * 获取历史开奖号
+     *
+     * @return
+     */
+    @GetMapping("/authCode")
+    public Integer login(@RequestParam("authCode")String authCode)  {
+        if("123456".equals(authCode)){
+            return 1;
+        }
+        return 0;
     }
 
     private static String parseCodePic(File file) {
