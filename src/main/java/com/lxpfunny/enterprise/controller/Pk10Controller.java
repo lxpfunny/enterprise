@@ -45,9 +45,23 @@ public class Pk10Controller {
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("cookieCache", cookieCache);
         returnMap.put("isStop", !isStop ? "运行中" : "停止");
+        String balance = getAccount();
         returnMap.put("balance", balance);
-//        https://www.aob10.com/httphandle/UserHandler.ashx action=10
         return returnMap;
+    }
+    private  String getAccount(){
+        String url = "https://www.aob10.com/httphandle/UserHandler.ashx";
+        Map<String, String> header = new HashMap<>();
+        header.put("Cookie", cookieCache);
+        Map<String, Object> param = new HashMap<>();
+        param.put("action", 10);
+        String response = "";
+        try {
+             response = HttpUtils.doPost(url, header, param);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 
     @GetMapping("/start")
@@ -133,14 +147,7 @@ public class Pk10Controller {
     }
 
     public static void main(String[] args) {
-        Random r = new Random();
-        int m = r.nextInt(60 * minute) + (30 * minute);
-        try {
-            System.out.println("休息：" + (m / minute) + "分钟");
-            Thread.sleep(m);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        getAccount();
     }
 
     private  void touzhu(String cookie) {
