@@ -36,6 +36,7 @@ public class Pk10Controller {
     static boolean isSleep = true;
     static String balance = "";
     static String cookieCache = "";
+    static String qianType = "3";
     static Map<String, Thread> threadMap = new HashMap<>();
 
     @GetMapping("/getcookie")
@@ -48,9 +49,12 @@ public class Pk10Controller {
     }
 
     @GetMapping("/start")
-    public void start(@RequestParam("cookie")  String cookie) {
+    public void start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType) {
         cookieCache = cookie;
         isStop = false;
+        if(StringUtils.isNotEmpty(qianType)){
+            Pk10Controller.qianType = qianType;
+        }
         Thread t = new Thread(new Runnable() {
 
             @Override
@@ -156,7 +160,7 @@ public class Pk10Controller {
         }
         int qihao = currentNumber + 1;
         if (StringUtils.isNotBlank(xiadanhao)) {
-            xiadan("3", "1", cookie, xiadanhao, qihao);
+            xiadan(qianType, "1", cookie, xiadanhao, qihao);
         }
 
     }
@@ -172,7 +176,7 @@ public class Pk10Controller {
      */
     private  void xiadan(String qian, String bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
-        qian = "3";
+//        qian = "3";
         bei = "1";
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
@@ -255,7 +259,7 @@ public class Pk10Controller {
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
                         System.out.println("期号：" + qishu + "未中奖,第一次加倍");
-                        xiadan2("", "", cookie, xiadanhao, qihao + 1);
+                        xiadan2(qianType, "", cookie, xiadanhao, qihao + 1);
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
                         continue;
@@ -284,7 +288,6 @@ public class Pk10Controller {
      */
     private static void xiadan2(String qian, String bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
-        qian = "3";
         bei = "3";
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
@@ -372,7 +375,7 @@ public class Pk10Controller {
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
                         System.out.println("期号：" + qishu + "未中奖,第二次加倍");
-                        xiadan3("", "", cookie, xiadanhao, qihao + 1);
+                        xiadan3(qianType, "", cookie, xiadanhao, qihao + 1);
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
                         continue;
@@ -401,7 +404,7 @@ public class Pk10Controller {
      */
     private static void xiadan3(String qian, String bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
-        qian = "3";
+//        qian = "3";
         bei = "8";
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
