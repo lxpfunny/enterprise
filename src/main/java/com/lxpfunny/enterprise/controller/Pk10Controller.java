@@ -37,6 +37,7 @@ public class Pk10Controller {
     static String balance = "";
     static String cookieCache = "";
     static String qianType = "3";
+    static String bei = "1";
     static Map<String, Thread> threadMap = new HashMap<>();
 
     @GetMapping("/getcookie")
@@ -45,15 +46,19 @@ public class Pk10Controller {
         returnMap.put("cookieCache", cookieCache);
         returnMap.put("isStop", !isStop ? "运行中" : "停止");
         returnMap.put("balance", balance);
+//        https://www.aob10.com/httphandle/UserHandler.ashx action=10
         return returnMap;
     }
 
     @GetMapping("/start")
-    public void start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType) {
+    public void start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType,@RequestParam("bei")String bei) {
         cookieCache = cookie;
         isStop = false;
         if(StringUtils.isNotEmpty(qianType)){
             Pk10Controller.qianType = qianType;
+        }
+        if(StringUtils.isNotEmpty(bei)){
+            Pk10Controller.bei = bei;
         }
         Thread t = new Thread(new Runnable() {
 
@@ -128,9 +133,14 @@ public class Pk10Controller {
     }
 
     public static void main(String[] args) {
-
-//        login();
-//        parseCodePic();
+        Random r = new Random();
+        int m = r.nextInt(60 * minute) + (30 * minute);
+        try {
+            System.out.println("休息：" + (m / minute) + "分钟");
+            Thread.sleep(m);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private  void touzhu(String cookie) {
@@ -160,7 +170,7 @@ public class Pk10Controller {
         }
         int qihao = currentNumber + 1;
         if (StringUtils.isNotBlank(xiadanhao)) {
-            xiadan(qianType, "1", cookie, xiadanhao, qihao);
+            xiadan(qianType, bei, cookie, xiadanhao, qihao);
         }
 
     }
@@ -177,7 +187,6 @@ public class Pk10Controller {
     private  void xiadan(String qian, String bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
 //        qian = "3";
-        bei = "1";
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
@@ -259,7 +268,7 @@ public class Pk10Controller {
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
                         System.out.println("期号：" + qishu + "未中奖,第一次加倍");
-                        xiadan2(qianType, "", cookie, xiadanhao, qihao + 1);
+                        xiadan2(qianType, bei, cookie, xiadanhao, qihao + 1);
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
                         continue;
@@ -288,7 +297,7 @@ public class Pk10Controller {
      */
     private static void xiadan2(String qian, String bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
-        bei = "3";
+        bei = String.valueOf(3 * Integer.parseInt(bei));
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
@@ -375,7 +384,7 @@ public class Pk10Controller {
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
                         System.out.println("期号：" + qishu + "未中奖,第二次加倍");
-                        xiadan3(qianType, "", cookie, xiadanhao, qihao + 1);
+                        xiadan3(qianType, bei, cookie, xiadanhao, qihao + 1);
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
                         continue;
@@ -405,7 +414,7 @@ public class Pk10Controller {
     private static void xiadan3(String qian, String bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
 //        qian = "3";
-        bei = "8";
+        bei = String.valueOf(9 * Integer.parseInt(bei));
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
