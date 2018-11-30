@@ -82,10 +82,12 @@ public class Pk10Controller {
                     Date now = new Date();
                     int hours = now.getHours();
                     if (hours < 9 || hours > 23) {
+                        System.out.println("开始下单："+i+",isSleep:"+isSleep);
+                        isSleep = true;
                         continue;
                     }
                     if (i > 0 && isSleep) {
-                        int m = r.nextInt(30 * minute) + (15 * minute);
+                        int m = r.nextInt(60 * minute) + (30 * minute);
                         try {
                             System.out.println("休息：" + (m / minute) + "分钟");
                             Thread.sleep(m);
