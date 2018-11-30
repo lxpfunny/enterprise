@@ -8,7 +8,7 @@
     <script>
         $(function () {
             $("#submit").on("click", function () {
-                if (!checkAuthCode()) {
+                if (checkAuthCode() == 0) {
                     alert("请输入正确的操作码");
                     return;
                 }
@@ -17,7 +17,7 @@
                 }
             });
             $("#login").on("click", function () {
-                if (!checkAuthCode()) {
+                if (checkAuthCode() == 0) {
                     alert("请输入正确的操作码");
                     return;
                 }
@@ -96,18 +96,17 @@
 
             function checkAuthCode() {
                 var val = prompt('请输入授权的校验码', '');
+                var code = 0;
                 $.ajax({
                     url: "/pk10/authCode",
                     type: "get",
                     data: {"authCode": val},
+                    async:false,
                     success: function (data) {
-                        if (data == 1) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        code = data;
                     }
                 });
+                return code;
             }
 
         });
