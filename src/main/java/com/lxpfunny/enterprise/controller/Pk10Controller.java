@@ -85,6 +85,7 @@ public class Pk10Controller {
                     int hours = now.getHours();
                     if (hours < 9 || hours > 23) {
                         System.out.println("开始下单："+i+",isSleep:"+isSleep);
+                        i=0;
                         isSleep = true;
                         continue;
                     }
