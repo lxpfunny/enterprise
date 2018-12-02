@@ -107,14 +107,7 @@ public class Pk10Controller {
                         System.out.println("线程中断退出");
                         return;
                     }
-                    Date now = new Date();
-                    int hours = now.getHours();
-                    if (hours < 9 || hours > 23) {
-                        System.out.println("开始下单："+i+",isSleep:"+isSleep);
-                        i=0;
-                        isSleep = true;
-                        continue;
-                    }
+
                     if (i > 0 && isSleep) {
                         int m = r.nextInt(60 * minute) + (30 * minute);
                         try {
@@ -123,6 +116,20 @@ public class Pk10Controller {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                    }
+                    Date now = new Date();
+                    int hours = now.getHours();
+                    if (hours > 23) {
+//                        System.out.println("开始下单："+i+",isSleep:"+isSleep);
+                        System.out.println("当天暂停下单");
+                        try {
+                            Thread.sleep(9*60*minute);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        i = 0;
+                        isSleep = true;
+                        continue;
                     }
                     if(StringUtils.isNotEmpty(loginCookie)){
                         touzhu(loginCookie);
