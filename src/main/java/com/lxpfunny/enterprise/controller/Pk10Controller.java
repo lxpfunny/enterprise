@@ -38,6 +38,8 @@ public class Pk10Controller {
     static String cookieCache = "";
     static String qianType = "3";
     static String bei = "1";
+    static int zhongCount = 0;
+    static int guaCount = 0;
     static Map<String, Thread> threadMap = new HashMap<>();
 
     @GetMapping("/getcookie")
@@ -124,6 +126,8 @@ public class Pk10Controller {
                         System.out.println("当天暂停下单");
                         try {
                             Thread.sleep(9*60*minute);
+                            zhongCount=0;
+                            guaCount = 0;
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -162,6 +166,9 @@ public class Pk10Controller {
 
     private  void touzhu(String cookie) {
 
+        if(zhongCount - (guaCount*3) >=3){
+            return;
+        }
 
         String xiadanhao = "";
         for (int i = 0; i < 10; i++) {
@@ -281,11 +288,13 @@ public class Pk10Controller {
                         //中奖退出
                         System.out.println("期号：" + qishu + "已中奖");
                         isSleep = true;
+                        zhongCount ++;
                         return;
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
 //                        System.out.println("期号：" + qishu + "未中奖,第一次加倍");
 //                        xiadan2(qianType, bei, cookie, xiadanhao, qihao + 1);
+                        guaCount++;
                         System.out.println("期号：" + qishu + "未中奖");
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
