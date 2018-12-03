@@ -109,7 +109,7 @@ public class Pk10Controller {
                     }
 
                     if (i > 0 && isSleep) {
-                        int m = r.nextInt(60 * minute) + (30 * minute);
+                        int m = r.nextInt(30 * minute) + (30 * minute);
                         try {
                             System.out.println("休息：" + (m / minute) + "分钟");
                             Thread.sleep(m);
@@ -119,7 +119,7 @@ public class Pk10Controller {
                     }
                     Date now = new Date();
                     int hours = now.getHours();
-                    if (hours > 23) {
+                    if (hours < 9) {
 //                        System.out.println("开始下单："+i+",isSleep:"+isSleep);
                         System.out.println("当天暂停下单");
                         try {
@@ -284,8 +284,9 @@ public class Pk10Controller {
                         return;
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
-                        System.out.println("期号：" + qishu + "未中奖,第一次加倍");
-                        xiadan2(qianType, bei, cookie, xiadanhao, qihao + 1);
+//                        System.out.println("期号：" + qishu + "未中奖,第一次加倍");
+//                        xiadan2(qianType, bei, cookie, xiadanhao, qihao + 1);
+                        System.out.println("期号：" + qishu + "未中奖");
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
                         continue;
