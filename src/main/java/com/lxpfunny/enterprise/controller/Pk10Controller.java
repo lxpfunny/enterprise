@@ -131,8 +131,7 @@ public class Pk10Controller {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        i = 0;
-                        isSleep = true;
+                        isSleep = false;
                         continue;
                     }
                     if(StringUtils.isNotEmpty(loginCookie)){
