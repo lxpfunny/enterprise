@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by lixiaopeng on 2018/11/24.
@@ -41,6 +43,8 @@ public class Pk10Controller {
     static int zhongCount = 0;
     static int guaCount = 0;
     static Map<String, Thread> threadMap = new HashMap<>();
+    static List<ExecutorService> services = new ArrayList<>();
+
 
     @GetMapping("/getcookie")
     public Map<String, String> getCookie() {
@@ -70,17 +74,25 @@ public class Pk10Controller {
     }
 
     @GetMapping("/start")
-    public void start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType,@RequestParam("bei")String bei) {
+    public Map<String,String> start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType,@RequestParam("bei")String bei) {
         cookieCache = cookie;
         isStop = false;
+        Map<String, String> map = new HashMap<>();
         if(StringUtils.isNotEmpty(qianType)){
             Pk10Controller.qianType = qianType;
         }
         if(StringUtils.isNotEmpty(bei)){
             Pk10Controller.bei = bei;
         }
-        Thread t = new Thread(new Runnable() {
 
+        if(services.size() > 0){
+            map.put("code", "1");
+            map.put("msg", "下单程序正在运行，先终止程序，在下单");
+            return map;
+        }
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        services.add(executor);
+        executor.execute(new Runnable() {
             @Override
             public void run() {
                 Random r = new Random();
@@ -116,7 +128,8 @@ public class Pk10Controller {
                             System.out.println("休息：" + (m / minute) + "分钟");
                             Thread.sleep(m);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            isStop = true;
+                            continue;
                         }
                     }
                     Date now = new Date();
@@ -129,7 +142,9 @@ public class Pk10Controller {
                             zhongCount=0;
                             guaCount = 0;
                         } catch (InterruptedException e) {
+                            isStop = true;
                             e.printStackTrace();
+                            continue;
                         }
                         isSleep = false;
                         continue;
@@ -143,27 +158,23 @@ public class Pk10Controller {
                 }
             }
         });
-        threadMap.put(t.getName(), t);
-        t.start();
+        map.put("code", "0");
+        return map;
     }
 
     @GetMapping("/stop")
     public void stop() {
-        Set<String> set = threadMap.keySet();
-        for (String s : set) {
-            Thread t = threadMap.get(s);
-            t.interrupt();
-            t.stop();
-            isStop = true;
+        for (ExecutorService service : services) {
+            service.shutdownNow();
         }
-        threadMap.clear();
+        services.clear();
     }
 
     public static void main(String[] args) {
 //        getAccount();
     }
 
-    private  void touzhu(String cookie) {
+    private  void touzhu(String cookie)  {
 
         if(zhongCount - (guaCount*3) >=3){
             return;
@@ -176,7 +187,9 @@ public class Pk10Controller {
                     Thread.sleep(2 * minute);
                 }
             } catch (InterruptedException e) {
+                isStop = true;
                 e.printStackTrace();
+                return;
             }
             List<String> historyKaijiang = getKaijiang();
             if (historyKaijiang == null) {
@@ -307,6 +320,8 @@ public class Pk10Controller {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                isStop = true;
+                return;
             }
         }
 
@@ -552,7 +567,7 @@ public class Pk10Controller {
      * @return
      */
     @PostMapping("/jilu")
-    public List<Map<String, String>> start(@RequestBody Map<String, String> map) {
+    public List<Map<String, String>> jilu(@RequestBody Map<String, String> map) {
         String cookie = map.get("cookie");
         String startTime = map.get("startTime");
         String endTime = map.get("endTime");
