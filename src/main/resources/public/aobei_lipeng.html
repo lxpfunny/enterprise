@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>澳贝</title>
+    <script src="jquery-1.7.2.js"></script>
+    <script src="jquery.form.js"></script>
+    <script>
+        $(function () {
+            $("#submit").on("click", function () {
+                if (checkAuthCode() == 0) {
+                    alert("请输入正确的操作码");
+                    return;
+                }
+                if (confirm("是否确定开始下单")) {
+                    $.ajax({
+                        url: "/pk10/lipen/start",
+                        type: "get",
+                        data: $("#orderForm").serialize(),
+                        contentType: "application/json",
+                        dataType: "json",
+                        success: function (data) {
+                            var code = data.code;
+                            var msg = data.msg;
+                            if(code != 0){
+                                alert(msg);
+                            }else{
+                                alert("下单成功");
+                            }
+
+                        },
+                        error: function (msg) {
+                            alert(msg);
+                        }
+
+
+                    });
+                }
+            });
+            $("#login").on("click", function () {
+                if (checkAuthCode() == 0) {
+                    alert("请输入正确的操作码");
+                    return;
+                }
+                $.ajax({
+                    url: "/pk10/lipen/login",
+                    type: "get",
+                    success: function (data) {
+                        var code = data.respCode;
+                        var balance = data.balance;
+                        var cookieCache = data.cookieCache;
+                        if (code == 0) {
+                            $("#balance").html(balance);
+                            $("#cookie").val(cookieCache);
+                            $("#cookieCache").html(cookieCache);
+                            alert("登陆成功");
+                        } else {
+                            alert("登陆失败");
+                        }
+
+                    },
+                    error: function (msg) {
+                        alert(msg);
+                    }
+
+
+                });
+            });
+
+            $("#stop").on("click", function () {
+                if (checkAuthCode() == 0) {
+                    alert("请输入正确的操作码");
+                    return;
+                }
+                $.ajax({
+                    url: "/pk10/lipen/stop",
+                    type: "get",
+                    success: function (data) {
+                        alert("已停止");
+                    },
+                    error: function (msg) {
+                        alert(msg);
+                    }
+
+
+                });
+            });
+            $("#search").on("click", function () {
+
+                $("#jilu  tr:not(:first)").remove();
+                var startTime = $("#startTime").val();
+                var endTime = $("#endTime").val();
+                var param = {"cookie": $("#cookie").val()};
+                if (startTime != "") {
+                    param.startTime = startTime;
+                }
+                if (endTime != "") {
+                    param.endTime = endTime;
+                }
+                $.ajax({
+                    url: "/pk10/lipen/jilu",
+                    type: "post",
+                    data: JSON.stringify(param),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        $.each(data, function (i) {
+                            var d = data[i];
+                            var tr = "<tr><td>" + d.tn + "</td><td>" + d.at + "</td><td>" + d.by + "</td><td>" + d.bs + "</td><td>" + d.os + "</td><td><a href='https://www.aob10.com/Order.aspx?oid=" + d.id + "' target='_blank'>查看</a></td></tr>";
+                            $("#jilu").append($(tr));
+                        });
+
+                    },
+                    error: function (msg) {
+                        alert(msg);
+                    }
+
+
+                });
+            });
+            $.ajax({
+                url: "/pk10/lipen/getcookie",
+                type: "get",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (data) {
+                    var isStop = data.isStop;
+                    var cookieCache = data.cookieCache;
+                    var balance = data.balance;
+                    $("#isStop").text(isStop);
+                    $("#cookieCache").text(cookieCache);
+                    $("#cookie").val(cookieCache);
+                    $("#balance").text(balance);
+                }
+            });
+
+            function checkAuthCode() {
+                var val = prompt('请输入授权的校验码', '');
+                var code = 0;
+                $.ajax({
+                    url: "/pk10/lipen/authCode",
+                    type: "get",
+                    data: {"authCode": val},
+                    async:false,
+                    success: function (data) {
+                        code = data;
+                    }
+                });
+                return code;
+            }
+
+        });
+
+    </script>
+</head>
+<style>
+    .background {
+        height: 1200px;
+        position: absolute;
+        width: 100%;
+        background: url(05d922a0b0c5518dba4e5d295dccf269.jpg) 50% 0 no-repeat;
+        z-index: -1;
+        left: 0;
+        right: 0;
+        opacity: 0.4;
+        background-size: cover;
+    }
+
+    img {
+        border: none;
+    }
+
+    .main {
+        margin: 0 auto;
+        width: 900px;
+        /*background: gray;*/
+        height: 900px;
+    }
+</style>
+<body>
+<div class="background"></div>
+<div class="main">
+    <div>
+        <h1>澳贝下单</h1>
+        <h3>余额：</h3><span id="balance"></span>
+        <h3>服务器状态:<a id="isStop" style="color: red"></a></h3>
+        <h3 style="display: none">缓存cookie:<a id="cookieCache"></a></h3>
+        <form class="form-horizontal" action="/pk10/lipen/start " method="get" id="orderForm" enctype="text/plain">
+            <span>cookie：</span><input type="text" id="cookie" name="cookie"/>
+            <span>钱类型：</span>
+            <!--<input type="text" id="qianType" name="qianType" value="2"/>-->
+            <select id="qianType" name="qianType" >
+                <option value="1">元</option>
+                <option value="2">角</option>
+                <option value="3">分</option>
+            </select>
+            <span>起始倍数：</span><input type="text" id="bei" name="bei" value="2"/>
+        </form>
+        <hr>
+        <div >
+            <button id="submit">下单</button>
+            <button id="login">登陆</button>
+            <button id="search">查询</button>
+            <button id="stop">停止</button>
+        </div>
+        <hr>
+        <div>
+            <span>开始时间：</span><input type="text" id="startTime" name="startTime"/>
+            <span>结束时间：</span><input type="text" id="endTime" name="endTime"/>
+        </div>
+    </div>
+    <div>
+        <h1>下单记录</h1>
+        <div style="overflow:auto;">
+        <table id="jilu" style="text-align:center;">
+            <tr>
+                <!--https://www.aob10.com/Order.aspx?oid=4252344D46B10CDD7101B9E6C18A094B-->
+                <td width="10%">期号</td>
+                <td width="30%">时间</td>
+                <td width="20%">投注金额</td>
+                <td width="20%">中奖金额</td>
+                <td width="10%">中奖状态</td>
+                <td>操作</td>
+            </tr>
+        </table>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
