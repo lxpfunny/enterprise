@@ -173,7 +173,7 @@ public class Pk10LipengController {
 
     private  void touzhu(String cookie)  {
 
-        if(zhongCount - (guaCount*3) >=3){
+        if((zhongCount + guaCount) >=3){
             return;
         }
 
