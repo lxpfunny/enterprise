@@ -310,6 +310,7 @@ public class Pk10Controller {
 //                        xiadan2(qianType, bei, cookie, xiadanhao, qihao + 1);
                         guaCount++;
                         System.out.println("期号：" + qishu + "未中奖");
+                        return;
                     } else if (status.equals("1")) {
                         System.out.println("期号：" + qishu + "未开奖");
                         continue;
