@@ -167,6 +167,8 @@ public class Pk10Controller {
         for (ExecutorService service : services) {
             service.shutdownNow();
         }
+        zhongCount =0;
+        guaCount = 0;
         services.clear();
     }
 

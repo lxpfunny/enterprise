@@ -12,6 +12,10 @@
                     alert("请输入正确的操作码");
                     return;
                 }
+                if($("#bei").val() == ""){
+                    alert("请输入倍数");
+                    return;
+                }
                 if (confirm("是否确定开始下单")) {
                     $.ajax({
                         url: "/pk10/start",
@@ -194,7 +198,7 @@
                 <option value="2">角</option>
                 <option value="3">分</option>
             </select>
-            <span>起始倍数：</span><input type="text" id="bei" name="bei" value="2"/>
+            <span>起始倍数：</span><input type="text" id="bei" name="bei" value=""/>
         </form>
         <hr>
         <div >
