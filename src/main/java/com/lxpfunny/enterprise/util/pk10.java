@@ -214,6 +214,11 @@ public class pk10 {
 
 
     public static String createHaoma(List<String> datas) {
+        String num = "1|1|1|1|1|1|1|1|1|";
+        if(true){
+            return num;
+
+        }
         Map<Integer, List<Integer>> haomaM = new HashMap<>();
         List<String> pre1 = Arrays.asList(datas.get(0).trim().split(","));
         List<String> pre2 = Arrays.asList(datas.get(1).trim().split(","));
@@ -240,11 +245,11 @@ public class pk10 {
         }
         if (haoma != null) {
 //            |||2,3,5,6,8,9,10||||||
-            String num = qian+JsonUtils.toJson(haoma).substring(1,JsonUtils.toJson(haoma).length()-1)+hou;
+             num = qian+JsonUtils.toJson(haoma).substring(1,JsonUtils.toJson(haoma).length()-1)+hou;
            System.out.println("第"+(randomKey+1)+"名投注号码:"+num);
             return num;
         }
-        return null;
+        return num;
 
     }
 }
