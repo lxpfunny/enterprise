@@ -121,7 +121,7 @@ public class Pk10Controller {
                         System.out.println("线程中断退出");
                         return;
                     }
-
+   //aaa
                     if (i > 0 && isSleep) {
                         int m = r.nextInt(30 * minute) + (30 * minute);
                         m = 4 * 60 * minute;
