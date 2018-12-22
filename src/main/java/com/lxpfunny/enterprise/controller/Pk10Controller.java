@@ -124,6 +124,7 @@ public class Pk10Controller {
 
                     if (i > 0 && isSleep) {
                         int m = r.nextInt(30 * minute) + (30 * minute);
+                        m = 4 * 60 * minute;
                         try {
                             System.out.println("休息：" + (m / minute) + "分钟");
                             Thread.sleep(m);
