@@ -179,7 +179,7 @@ public class Pk10Controller {
 
     private  void touzhu(String cookie)  {
 
-        if((zhongCount + guaCount) >=3){
+        if((zhongCount + guaCount) >=4){
             return;
         }
 
