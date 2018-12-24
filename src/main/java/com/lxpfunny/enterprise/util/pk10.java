@@ -214,7 +214,7 @@ public class pk10 {
 
 
     public static String createHaoma(List<String> datas) {
-        String num = "1|1|1|1|1|1|1|1|1|";
+        String num = "1|1|1|1|1|1|1|1||";
         if(true){
             return num;
 
