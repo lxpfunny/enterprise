@@ -97,14 +97,17 @@ public class HttpUtils {
         String apiUrl = url;
         StringBuffer param = new StringBuffer();
         int i = 0;
-        for (String key : params.keySet()) {
-            if (i == 0)
-                param.append("?");
-            else
-                param.append("&");
-            param.append(key).append("=").append(params.get(key));
-            i++;
+        if(params != null){
+            for (String key : params.keySet()) {
+                if (i == 0)
+                    param.append("?");
+                else
+                    param.append("&");
+                param.append(key).append("=").append(params.get(key));
+                i++;
+            }
         }
+
         apiUrl += param;
         String result = null;
         try {

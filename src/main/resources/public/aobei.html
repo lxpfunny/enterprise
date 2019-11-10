@@ -110,7 +110,7 @@
                     success: function (data) {
                         $.each(data, function (i) {
                             var d = data[i];
-                            var tr = "<tr><td>" + d.tn + "</td><td>" + d.at + "</td><td>" + d.by + "</td><td>" + d.bs + "</td><td>" + d.os + "</td><td><a href='https://www.aob10.com/Order.aspx?oid=" + d.id + "' target='_blank'>查看</a></td></tr>";
+                            var tr = "<tr><td>" + d.tn + "</td><td>" + d.at + "</td><td>" + d.by + "</td><td>" + d.bs + "</td><td>" + d.os + "</td><td><a href='https://www.aub06.com/Order.aspx?oid=" + d.id + "' target='_blank'>查看</a></td></tr>";
                             $("#jilu").append($(tr));
                         });
 
@@ -139,6 +139,9 @@
             });
 
             function checkAuthCode() {
+                if(true){
+                return 1;
+                }
                 var val = prompt('请输入授权的校验码', '');
                 var code = 0;
                 $.ajax({

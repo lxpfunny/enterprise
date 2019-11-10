@@ -15,6 +15,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -31,7 +32,7 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("/pk10")
 public class Pk10Controller {
-    static int currentNumber = 0;
+    static Long currentNumber = 0L;
     static int minute = 60000;
     static boolean isStop = false;
     static boolean isLogin = false;
@@ -39,9 +40,14 @@ public class Pk10Controller {
     static String balance = "";
     static String cookieCache = "";
     static String qianType = "3";
-    static String bei = "1";
+    static Integer bei = 1;
+    static Integer jiabei = bei;
+    static Integer jiabeibeishu = 2;
     static int zhongCount = 0;
     static int guaCount = 0;
+    static int zhuiCount = 1;
+    static String xiadanhao = "";
+    public static Integer mingci = null;
     static Map<String, Thread> threadMap = new HashMap<>();
     static List<ExecutorService> services = new ArrayList<>();
 
@@ -56,7 +62,7 @@ public class Pk10Controller {
         return returnMap;
     }
     private  String getAccount(){
-        String url = "https://www.aob10.com/httphandle/UserHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/UserHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookieCache);
         Map<String, Object> param = new HashMap<>();
@@ -74,17 +80,24 @@ public class Pk10Controller {
     }
 
     @GetMapping("/start")
-    public Map<String,String> start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType,@RequestParam("bei")String bei) {
+    public Map<String,String> start(@RequestParam("cookie")  String cookie,@RequestParam("qianType")String qianType,@RequestParam("bei")Integer bei) {
+        Map<String, String> map = new HashMap<>();
+
+        if(bei == null){
+            map.put("code", "1");
+            map.put("msg", "请输入倍数");
+        }
+        if(StringUtils.isEmpty(cookie)){
+            map.put("code", "1");
+            map.put("msg", "请登录");
+        }
         cookieCache = cookie;
         isStop = false;
-        Map<String, String> map = new HashMap<>();
         if(StringUtils.isNotEmpty(qianType)){
             Pk10Controller.qianType = qianType;
         }
-        if(StringUtils.isNotEmpty(bei)){
             Pk10Controller.bei = bei;
-        }
-
+//        services.clear();
         if(services.size() > 0){
             map.put("code", "1");
             map.put("msg", "下单程序正在运行，先终止程序，在下单");
@@ -98,23 +111,23 @@ public class Pk10Controller {
                 Random r = new Random();
                 String loginCookie = "";
                 for (int i = 0; ; i++) {
-                    if(isLogin){
-                        isLogin = false;
-                        try{
-                            Map<String,String> loginRes = login();
-                            String code = loginRes.get("respCode");
-                            if("0".equals(code)){
-                                loginCookie = loginRes.get("cookieCache");
-                                System.out.println("登陆成功");
-                                isSleep = false;
-                            }else{
-                                isStop = true;
-                            }
-                        }catch (Exception e){
-                            isStop = true;
-                            e.printStackTrace();
-                        }
-                    }
+//                    if(isLogin){
+//                        isLogin = false;
+//                        try{
+//                            Map<String,String> loginRes = login();
+//                            String code = loginRes.get("respCode");
+//                            if("0".equals(code)){
+//                                loginCookie = loginRes.get("cookieCache");
+//                                System.out.println("登陆成功");
+//                                isSleep = false;
+//                            }else{
+//                                isStop = true;
+//                            }
+//                        }catch (Exception e){
+//                            isStop = true;
+//                            e.printStackTrace();
+//                        }
+//                    }
 
 
                     if (isStop) {
@@ -123,8 +136,8 @@ public class Pk10Controller {
                     }
    //aaa
                     if (i > 0 && isSleep) {
-                        int m = r.nextInt(30 * minute) + (30 * minute);
-                        m = 4 * 60 * minute;
+                        int m = r.nextInt(30 * minute);
+
                         try {
                             System.out.println("休息：" + (m / minute) + "分钟");
                             Thread.sleep(m);
@@ -135,13 +148,16 @@ public class Pk10Controller {
                     }
                     Date now = new Date();
                     int hours = now.getHours();
-                    if (hours < 9) {
+                    if (hours < 12 && hours > 3) {
 //                        System.out.println("开始下单："+i+",isSleep:"+isSleep);
                         System.out.println("当天暂停下单");
                         try {
                             Thread.sleep(9*60*minute);
                             zhongCount=0;
                             guaCount = 0;
+                            jiabei = bei;
+                            zhuiCount=1;
+                            mingci = null;
                         } catch (InterruptedException e) {
                             isStop = true;
                             e.printStackTrace();
@@ -150,6 +166,11 @@ public class Pk10Controller {
                         isSleep = false;
                         continue;
                     }
+                    zhongCount=0;
+                    guaCount = 0;
+                    jiabei = bei;
+                    zhuiCount=1;
+                    mingci = null;
                     if(StringUtils.isNotEmpty(loginCookie)){
                         touzhu(loginCookie);
                     }else{
@@ -175,14 +196,15 @@ public class Pk10Controller {
 
     public static void main(String[] args) {
 //        getAccount();
+        String cookie = "__cfduid=d148398fc818dccf482ce2cbd4af8d12e1573297047; ASP.NET_SessionId=sj3yfkepbobqk3bd3wjjyxpk";
+        getMyrecord(20191110008L,cookie,xiadanhao);
     }
 
     private  void touzhu(String cookie)  {
 
-        if((zhongCount + guaCount) >=3){
-            return;
-        }
-
+            xiadan(qianType, bei, cookie,"",null,null);
+    }
+    private static String createXiadanhao(Integer mingci){
         String xiadanhao = "";
         for (int i = 0; i < 10; i++) {
             try {
@@ -192,14 +214,14 @@ public class Pk10Controller {
             } catch (InterruptedException e) {
                 isStop = true;
                 e.printStackTrace();
-                return;
+                return "";
             }
             List<String> historyKaijiang = getKaijiang();
             if (historyKaijiang == null) {
                 System.out.println("没有最新开奖");
                 continue;
             }
-            xiadanhao = pk10.createHaoma(historyKaijiang);
+            xiadanhao = pk10.createHaoma1(historyKaijiang,mingci);
             if (StringUtils.isEmpty(xiadanhao)) {
                 System.out.println("没有符合投注条件");
                 continue;
@@ -207,11 +229,7 @@ public class Pk10Controller {
                 break;
             }
         }
-        int qihao = currentNumber + 1;
-        if (StringUtils.isNotBlank(xiadanhao)) {
-            xiadan(qianType, bei, cookie, xiadanhao, qihao);
-        }
-
+        return xiadanhao;
     }
 
     /**
@@ -220,28 +238,38 @@ public class Pk10Controller {
      * @param qian
      * @param bei
      * @param cookie
-     * @param xiadanhao
-     * @param qihao
+
      */
-    private  void xiadan(String qian, String bei, String cookie, String xiadanhao, int qihao) {
+    private  static void xiadan(String qian, Integer bei, String cookie,String xiadanhao,Long qihao,Integer mingci) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
 //        qian = "3";
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
         }
+
+        if(StringUtils.isEmpty(xiadanhao)){
+            xiadanhao = createXiadanhao(mingci);
+
+        }
+        if(qihao == null){
+            qihao = currentNumber + 1;
+        }else {
+            qihao = qihao + 1;
+        }
+
         String template = "<ol><item><ms>qian</ms><bs>bei</bs><num>haoma</num><pid>11</pid></item></ol>";
-        String url = "https://www.aob10.com/httphandle/LotteryHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/LotteryHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookie);
         Map<String, Object> param = new HashMap<>();
         param.put("action", "3");
-        param.put("t", "6");
+        param.put("t", "89");
         param.put("n", qihao);
         //3==分 1=倍数
         template = template.replace("haoma", xiadanhao);
         template = template.replace("qian", qian);
-        template = template.replace("bei", bei);
+        template = template.replace("bei", String.valueOf(bei));
         param.put("ol", template);
         try {
             String response = HttpUtils.doPost(url, header, param);
@@ -249,7 +277,7 @@ public class Pk10Controller {
             if (String.valueOf(map.get("code")).equals("0")) {
                 System.out.println("期号：" + qihao + "下单成功");
                 //检测是否中奖
-                getMyrecord(qihao, xiadanhao, cookie);
+                getMyrecord(qihao,  cookie,xiadanhao);
             } else if (String.valueOf(map.get("code")).equals("-100")) {
                 System.out.println("登录超时");
                 isLogin = true;
@@ -274,22 +302,22 @@ public class Pk10Controller {
     }
 
 
-    private static void getMyrecord(int qihao, String xiadanhao, String cookie) {
+    private static void getMyrecord(long qihao, String cookie,String xiadanhao) {
 
         if (StringUtils.isEmpty(cookie)) {
-            cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
+            cookie = "__cfduid=d148398fc818dccf482ce2cbd4af8d12e1573297047; ASP.NET_SessionId=sj3yfkepbobqk3bd3wjjyxpk";
         }
-        String url = "https://www.aob10.com/httphandle/LotteryHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/LotteryHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookie);
         Map<String, Object> param = new HashMap<>();
         param.put("action", 6);
-        param.put("lotteryType", "6");
+        param.put("lotteryType", "89");
         param.put("betType", 1);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 20; i++) {
             try {
 
-                Thread.sleep(minute);
+                Thread.sleep(minute /2);
 
                 String response = HttpUtils.doPost(url, header, param);
                 String[] rs = response.split("\\|");
@@ -304,11 +332,16 @@ public class Pk10Controller {
                         System.out.println("期号：" + qishu + "已中奖");
                         isSleep = true;
                         zhongCount ++;
+                        jiabei = bei;
+                        zhuiCount=1;
+                        mingci = null;
                         return;
                     } else if (status.equals("3")) {
                         //未中奖 追单一次
-//                        System.out.println("期号：" + qishu + "未中奖,第一次加倍");
-//                        xiadan2(qianType, bei, cookie, xiadanhao, qihao + 1);
+                        System.out.println("期号：" + qishu + "未中奖,第"+zhuiCount+"次加倍");
+                        jiabei = jiabei*jiabeibeishu;
+                        xiadan(qianType, jiabei, cookie,null,qihao,mingci);
+                        zhuiCount++;
                         guaCount++;
                         System.out.println("期号：" + qishu + "未中奖");
                         break;
@@ -348,12 +381,12 @@ public class Pk10Controller {
 
         }
         String template = "<ol><item><ms>qian</ms><bs>bei</bs><num>haoma</num><pid>11</pid></item></ol>";
-        String url = "https://www.aob10.com/httphandle/LotteryHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/LotteryHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookie);
         Map<String, Object> param = new HashMap<>();
         param.put("action", "3");
-        param.put("t", "6");
+        param.put("t", "89");
         param.put("n", qihao);
         //3==分 1=倍数
         template = template.replace("haoma", xiadanhao);
@@ -402,7 +435,7 @@ public class Pk10Controller {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
         }
-        String url = "https://www.aob10.com/httphandle/LotteryHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/LotteryHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookie);
         Map<String, Object> param = new HashMap<>();
@@ -456,26 +489,26 @@ public class Pk10Controller {
      * @param xiadanhao
      * @param qihao
      */
-    private static void xiadan3(String qian, String bei, String cookie, String xiadanhao, int qihao) {
+    private static void xiadan3(String qian, Integer bei, String cookie, String xiadanhao, int qihao) {
         //        <ol><item><ms>3</ms><bs>1</bs><num>|||2,3,5,6,8,9,10||||||</num><pid>11</pid></item></ol>
 //        qian = "3";
-        bei = String.valueOf(9 * Integer.parseInt(bei));
+        bei = 9 * bei;
         if (StringUtils.isEmpty(cookie)) {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
         }
         String template = "<ol><item><ms>qian</ms><bs>bei</bs><num>haoma</num><pid>11</pid></item></ol>";
-        String url = "https://www.aob10.com/httphandle/LotteryHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/LotteryHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookie);
         Map<String, Object> param = new HashMap<>();
         param.put("action", "3");
-        param.put("t", "6");
+        param.put("t", "89");
         param.put("n", qihao);
         //3==分 1=倍数
         template = template.replace("haoma", xiadanhao);
         template = template.replace("qian", qian);
-        template = template.replace("bei", bei);
+        template = template.replace("bei", String.valueOf(bei));
         param.put("ol", template);
         try {
             String response = HttpUtils.doPost(url, header, param);
@@ -519,7 +552,7 @@ public class Pk10Controller {
             cookie = "__cfduid=db75aec07a6d7c6d2cd3b0d4ba11a76521543043842; ASP.NET_SessionId=1mvipwwoysdoojy42qqznd2m";
 
         }
-        String url = "https://www.aob10.com/httphandle/LotteryHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/LotteryHandler.ashx";
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", cookie);
         Map<String, Object> param = new HashMap<>();
@@ -582,7 +615,7 @@ public class Pk10Controller {
         if (StringUtils.isEmpty(endTime)) {
             endTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
         }
-        String url = "https://www.aob10.com/httphandle/UcenterHandler.ashx";
+        String url = "https://www.aub06.com/httphandle/UcenterHandler.ashx";
         Map<String, String> headers = new HashMap<>();
         headers.put("cookie", cookie);
         Map<String, Object> param = new HashMap<>();
@@ -603,6 +636,7 @@ public class Pk10Controller {
             e.printStackTrace();
         }
         if (resonse.equals("-1")|| resonse.equals("-100")) {
+            System.out.println("登录超时");
             return new ArrayList<>();
         }
         resonse = resonse.replace("'", "\"");
@@ -612,6 +646,13 @@ public class Pk10Controller {
 
         return record;
     }
+    @Scheduled(cron = "0 0/10 * * * ?")
+    public void getJilu(){
+        Map<String,String> param = new HashMap<>();
+        param.put("cookie",cookieCache);
+        System.out.println("刷新纪录");
+        jilu(param);
+    }
 
     /**
      * 获取历史开奖号
@@ -619,7 +660,7 @@ public class Pk10Controller {
      * @return
      */
     private static List<String> getKaijiang() {
-        String url = "https://www.aob10.com/Bjpk10Chart.aspx";
+        String url = "http://www.aub06.com/Bjpk10Chart.aspx?lotteryType=89";
         String resonse = HttpUtils.doGet(url, null, null);
         return parseHtml(resonse);
     }
@@ -634,7 +675,7 @@ public class Pk10Controller {
         String respCode = "";
         Map<String, String> respMap = new HashMap<>();
         try {
-            String loginurl = "https://www.aob10.com/aobei/login.aspx";
+            String loginurl = "https://www.aub06.com/aobei/login.aspx";
             CloseableHttpResponse resp = HttpUtils.doGetSSLResponse(loginurl, null, null);
             Header[] headers = resp.getHeaders("Set-Cookie");
             String uid = headers[0].getValue().split(";")[0];
@@ -651,12 +692,12 @@ public class Pk10Controller {
             Map<String, String> header = new HashMap<>();
             header.put("Cookie", cookie);
             String code = "";
-            String httpStr = HttpUtils.doGet("https://www.aob10.com/aobei/login.aspx", header, null);
+            String httpStr = HttpUtils.doGet("https://www.aub06.com/aobei/login.aspx", header, null);
             Document document = Jsoup.parse(httpStr);
             Element element = document.getElementById("captcha-img");
             String img = element.attr("src");
             img = img.replace("..", "");
-            String imgurl = "https://www.aob10.com" + img;
+            String imgurl = "https://www.aub06.com" + img;
             CloseableHttpResponse coderesp = HttpUtils.doGetSSLResponse(imgurl, header, null);
             HttpEntity codeEntity = coderesp.getEntity();
             File file = new File("C://Users//Administrator//Desktop//img//code.png");
@@ -671,7 +712,7 @@ public class Pk10Controller {
             code = parseCodePic(file);
 
 
-            String url = "https://www.aob10.com/httphandle/UserHandler.ashx";
+            String url = "https://www.aub06.com/httphandle/UserHandler.ashx";
 
             Map<String, Object> param = new HashMap<>();
             param.put("action", "1");
@@ -758,7 +799,7 @@ public class Pk10Controller {
         Elements elements = tbody.getElementsByTag("tr");
         Element currentTR = elements.get(0);
         Elements elementsTds = currentTR.getElementsByTag("td");
-        int number = Integer.parseInt(elementsTds.get(1).text());
+        Long number = Long.parseLong(elementsTds.get(1).text());
         if (number > currentNumber) {
             currentNumber = number;
         } else {

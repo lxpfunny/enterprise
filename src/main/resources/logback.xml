@@ -5,6 +5,7 @@
     <property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
     <!-- test文件路径 -->
     <property name="TEST_FILE_PATH" value="C://Users//Administrator//Desktop//logs" />
+    <!--<property name="TEST_FILE_PATH" value="F://" />-->
 
     <!-- 开发环境 -->
 

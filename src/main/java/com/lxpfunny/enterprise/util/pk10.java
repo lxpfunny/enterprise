@@ -1,5 +1,6 @@
 package com.lxpfunny.enterprise.util;
 
+import com.lxpfunny.enterprise.controller.Pk10Controller;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.StringUtils;
 
@@ -14,20 +15,22 @@ import java.util.*;
 public class pk10 {
 
     public static void main(String[] args) {
-        File file = new File("D:\\pk1.txt");
-        try {
-            FileInputStream inputStream = new FileInputStream(file);
-            List<String> datas = IOUtils.readLines(inputStream);
-//            plan1(datas);
-            for (int i = 0; i < 10000; i++) {
-//                plan2(datas);
-                plan1(datas);
-            }
+//        File file = new File("D:\\pk1.txt");
+//        try {
+//            FileInputStream inputStream = new FileInputStream(file);
+//            List<String> datas = IOUtils.readLines(inputStream);
+////            plan1(datas);
+//            for (int i = 0; i < 10000; i++) {
+////                plan2(datas);
+//                plan1(datas);
+//            }
+//
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private static void plan2(List<String> datas) {
@@ -195,9 +198,9 @@ public class pk10 {
             d2 = 1;
         }
         haoma.add(h);
-        haoma.add(h1);
+//        haoma.add(h1);
         haoma.add(h2);
-        haoma.add(h3);
+//        haoma.add(h3);
 //        haoma.add(pre);
         haoma.add(d);
         haoma.add(d1);
@@ -213,17 +216,49 @@ public class pk10 {
     }
 
 
+    public static String createHaoma1(List<String> datas,Integer mingci) {
+        String num = "1|1|1|1|1|1|1|1|1|";
+//        if(true){
+//            return num;
+//
+//        }
+        Random random = new Random();
+        Integer randomKey = mingci;
+        if(mingci == null){
+            randomKey= random.nextInt(10);
+        }
+        Pk10Controller.mingci = randomKey;
+        List<String> pre1 = Arrays.asList(datas.get(0).trim().split(","));
+
+        List<Integer> haoma = createHaoma(Integer.parseInt(pre1.get(randomKey)));
+
+        String qian = "";
+        String hou = "";
+        for (int i = 0; i <randomKey ; i++) {
+            qian += "|";
+        }
+        for (int i = 1; i <10-randomKey ; i++) {
+            hou += "|";
+        }
+        if (haoma != null) {
+//            |||2,3,5,6,8,9,10||||||
+             num = qian+JsonUtils.toJson(haoma).substring(1,JsonUtils.toJson(haoma).length()-1)+hou;
+           System.out.println("第"+(randomKey+1)+"名投注号码:"+num);
+            return num;
+        }
+        return num;
+
+    }
+
     public static String createHaoma(List<String> datas) {
         String num = "1|1|1|1|1|1|1|1|1|";
-        if(true){
-            return num;
 
-        }
         Map<Integer, List<Integer>> haomaM = new HashMap<>();
         List<String> pre1 = Arrays.asList(datas.get(0).trim().split(","));
         List<String> pre2 = Arrays.asList(datas.get(1).trim().split(","));
+        List<String> pre3 = Arrays.asList(datas.get(2).trim().split(","));
         for (int j = 0; j < pre1.size(); j++) {
-            if (pre1.get(j).equals(pre2.get(j))) {
+            if (pre1.get(j).equals(pre2.get(j)) && pre1.get(j).equals(pre3.get(j))) {
                 List<Integer> haoma = createHaoma(Integer.parseInt(pre1.get(j)));
                 haomaM.put(j, haoma);
             }
@@ -245,11 +280,12 @@ public class pk10 {
         }
         if (haoma != null) {
 //            |||2,3,5,6,8,9,10||||||
-             num = qian+JsonUtils.toJson(haoma).substring(1,JsonUtils.toJson(haoma).length()-1)+hou;
-           System.out.println("第"+(randomKey+1)+"名投注号码:"+num);
+            num = qian+JsonUtils.toJson(haoma).substring(1,JsonUtils.toJson(haoma).length()-1)+hou;
+            System.out.println("第"+(randomKey+1)+"名投注号码:"+num);
             return num;
         }
         return num;
 
     }
+
 }
